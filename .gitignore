@@ -8,3 +8,4 @@ work/mg/*
 !work/mg/tsconfig.json
 !work/*.py
 !work/final.sh
+!work/bref_crop.py

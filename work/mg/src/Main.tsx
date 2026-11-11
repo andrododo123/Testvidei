@@ -106,20 +106,39 @@ const Desk: React.FC = () => (
     <div style={{ position: 'absolute', inset: 0, boxShadow: '0 -18px 50px rgba(0,0,0,.45)' }} />
     <div style={{
       position: 'absolute', inset: 0,
-      background: 'linear-gradient(180deg, #b9ab98 0%, #d9cdbb 8%, #ebe2d4 35%, #f4eee5 100%)',
+      background: 'linear-gradient(180deg, #8c7d6b 0%, #ad9f8b 5%, #c9bca9 28%, #d6cbba 100%)',
     }} />
     {/* subtle wood grain */}
     <div style={{ position: 'absolute', inset: 0, opacity: 0.10, background: 'repeating-linear-gradient(179deg, rgba(120,90,60,.35) 0px, rgba(120,90,60,0) 2px, rgba(120,90,60,0) 23px, rgba(120,90,60,.25) 25px, rgba(120,90,60,0) 27px, rgba(120,90,60,0) 41px)' }} />
     {/* warm reflection of the backlight */}
     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 40% 30% at 50% 0%, rgba(255,170,100,.25), rgba(0,0,0,0) 100%)' }} />
-    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 3, background: 'rgba(255,255,255,.55)' }} />
+    {/* light fall-off: key light hits the middle, sides drop into shade */}
+    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 55% 75% at 50% 35%, rgba(0,0,0,0) 40%, rgba(20,12,6,.38) 100%)' }} />
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 2, background: 'rgba(255,240,220,.35)' }} />
   </div>
+);
+
+// ---------- film grain on the CG parts so they match the phone camera ----------
+const Grain: React.FC<{ f: number }> = ({ f }) => (
+  <svg width={W} height={H} style={{ position: 'absolute', left: 0, top: 0, opacity: 0.16, mixBlendMode: 'overlay' }}>
+    <filter id={`gr${f}`}><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={f} stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" /></filter>
+    <rect width={W} height={H} filter={`url(#gr${f})`} />
+  </svg>
+);
+
+// ---------- realism layers built per frame from the matte ----------
+const Shadow: React.FC<{ f: number }> = ({ f }) => (
+  <Img src={staticFile(`sh/s${String(f).padStart(4, '0')}.png`)} style={{ position: 'absolute', left: 0, top: 0, width: W, height: H }} />
+);
+const Wrap: React.FC<{ f: number }> = ({ f }) => (
+  <Img src={staticFile(`wr/w${String(f).padStart(4, '0')}.png`)} style={{ position: 'absolute', left: 0, top: 0, width: W, height: H, mixBlendMode: 'screen' }} />
 );
 
 // ---------- the person cut-out ----------
 const Person: React.FC<{ f: number }> = ({ f }) => (
   <Img src={staticFile(`p/p${String(f).padStart(4, '0')}.png`)}
-    style={{ position: 'absolute', left: 0, top: 0, width: W, height: H, filter: 'drop-shadow(0 22px 26px rgba(0,0,0,.42))' }} />
+    style={{ position: 'absolute', left: 0, top: 0, width: W, height: H }} />
 );
 
 // ---------- hook: big text behind his head ----------
@@ -365,7 +384,10 @@ const World: React.FC<{ t: number; f: number; z: number; ox?: number }> = ({ t, 
     <Grid t={t} />
     <HookText t={t} />
     <Desk />
+    <Grain f={f} />
+    <Shadow f={f} />
     <Person f={f} />
+    <Wrap f={f} />
   </AbsoluteFill>
 );
 
