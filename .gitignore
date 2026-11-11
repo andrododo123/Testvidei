@@ -1,0 +1,11 @@
+# heavy intermediates of the edit (rebuilt by the scripts)
+work/*
+!work/mg/
+work/mg/*
+!work/mg/src/
+!work/mg/package.json
+!work/mg/remotion.config.ts
+!work/mg/tsconfig.json
+!work/*.py
+!work/final.sh
+!work/bref_crop.py
